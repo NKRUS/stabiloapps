@@ -1,12 +1,14 @@
 package ru.kit.stabiloapps.dynamicTest;
 
 import javafx.concurrent.Task;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.kit.stabiloapps.dynamicTest.controller.DynamicTestController;
@@ -35,6 +37,13 @@ public class DynamicTestStage extends Stage {
 
             this.setScene(new Scene(root));
 
+            this.setOnCloseRequest(new EventHandler<WindowEvent>() {
+                @Override
+                public void handle(WindowEvent event) {
+                    close();
+                }
+            });
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -44,9 +53,10 @@ public class DynamicTestStage extends Stage {
         return path;
     }
 
-    public void close(boolean isCompleteTest) {
+    @Override
+    public void close() {
 
-        if (!isCompleteTest) {
+        if (controller.buttonOk.isDisable()) {
             // =========== ALERT DIALOG ==============
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("Выход");
@@ -58,19 +68,20 @@ public class DynamicTestStage extends Stage {
             if (alert.getResult() == ButtonType.OK) {
                 cancelTasks();
                 LOG.info("CLOSE STAGE, NOT SAVE");
-                this.close();
+                super.close();
             }
         } else {
             cancelTasks();
             LOG.info("CLOSE STAGE AND SAVE");
-            this.close();
+            super.close();
         }
     }
 
     private void cancelTasks() {
         List<Task> tasks = controller.getTasks();
         for (Task task : tasks) {
-            task.isCancelled();
+            task.cancel();
         }
+        controller.getStabilo().offDynamicData();
     }
 }

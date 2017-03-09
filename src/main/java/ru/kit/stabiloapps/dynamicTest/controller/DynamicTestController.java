@@ -134,7 +134,7 @@ public class DynamicTestController {
 
     private Timeline timer;
     private Task<Void> startTimer;
-    private int[] totalMiliSeconds = {0};
+    private volatile int[] totalMiliSeconds = {0};
 
     public void onStart(ActionEvent mouseEvent) {
         stopAndStartTimer();
@@ -149,17 +149,21 @@ public class DynamicTestController {
 
                 timer = new Timeline(new KeyFrame(Duration.millis(UPDATE_TIME),
 //                        ae -> time.setText(String.valueOf(totalMiliSeconds[0] += UPDATE_TIME))));
-                        ae -> progressBar.setProgress((totalMiliSeconds[0] += UPDATE_TIME) / END_TIME)));
+                        ae -> {progressBar.setProgress((totalMiliSeconds[0] += UPDATE_TIME) / END_TIME);
+
+
+                        }));
                 timer.setCycleCount(Timeline.INDEFINITE);
-                Thread t = new Thread(getGameHolderFigure());
-                t.setDaemon(true);
-                t.start();
+                Thread thread = new Thread(getStartGameTask());
+                thread.setDaemon(true);
+                thread.start();
                 timer.play();
 
 
                 while (!isCancelled()) {
+
                     if (totalMiliSeconds[0] >= END_TIME) {
-//                        getGameHolderFigure().cancel();
+//                        getStartGameTask().cancel();
                         timer.stop();
                         endPane.setVisible(true);
                         buttonOk.setDisable(false);
@@ -203,21 +207,25 @@ public class DynamicTestController {
 
     private boolean itWasFigureIsHold(MyCircle figure) {
         if (figure == null) return false;
-        if (cursor.isIntersect(figure) && figure.getHoldTime() <= HOLD_TIME) {
-            figure.setHoldTime(figure.getHoldTime() + UPDATE_TIME);
-            System.out.println("hold time < " + HOLD_TIME + " : " + figure.getHoldTime());
-            return false;
-        }
-        else if (!cursor.isIntersect(figure)){
-            figure.setHoldTime(0);
-            System.out.println("figure out " + figure.getHoldTime());
-            return false;
-        }
-        else {
+
+        if (cursor.isIntersect(figure)) {
             figure.setPassFigure(true);
-            System.out.println("figure hold " + figure.getHoldTime());
             return true;
         }
+        return false;
+
+//        if (cursor.isIntersect(figure) && figure.getHoldTime() <= HOLD_TIME) {
+//            figure.setHoldTime(figure.getHoldTime() + UPDATE_TIME);
+//            return false;
+//        }
+//        else if (!cursor.isIntersect(figure)){
+//            figure.setHoldTime(0);
+//            return false;
+//        }
+//        else {
+//            figure.setPassFigure(true);
+//            return true;
+//        }
     }
 
 
@@ -226,14 +234,14 @@ public class DynamicTestController {
     }
 
     public void onCancel(ActionEvent actionEvent) {
-        stage.close(!buttonOk.isDisable());
+        stage.close();
     }
 
     public void onSave(ActionEvent actionEvent) {
         Map<String, String> map = new HashMap<>();
-        map.put("dynamic_test", String.valueOf(figureList.stream().filter(s->s.isPassFigure()).collect(Collectors.toList()).size()));
+        map.put("dynamic_test", String.valueOf(figureList.stream().filter(MyCircle::isPassFigure).collect(Collectors.toList()).size()));
         Util.writeJSON(stage.getPath(), map);
-        stage.close(!buttonOk.isDisable());
+        stage.close();
     }
 
     public void addFiguresInGroup() {
@@ -261,27 +269,32 @@ public class DynamicTestController {
     }
 
     private MyCircle figure = null;
-    private Task<Void> getGameHolderFigure() {
-        return new Task<Void>() {
+    private Task<Void> startGame;
+    private Task<Void> getStartGameTask() {
+        if (startGame != null) {
+            startGame.cancel();
+        }
+        return startGame = new Task<Void>() {
             @Override
             protected Void call() throws Exception {
 
                 while (totalMiliSeconds[0] < TIMEOUT_BETWEEN_FIGURES) {
-                    sleep(10);
+                    sleep(20);
                 }
                 for (int i = 1; i < figureList.size() && !isCancelled(); i++) {
+                    System.out.println(Thread.currentThread().getName());
                     figure = figureList.get(i);
                     figure.setVisible(true);
 
-                    while (totalMiliSeconds[0] < START_TIMER) {
-                        sleep(10);
+                    while (totalMiliSeconds[0] < START_TIMER && !isCancelled()) {
+                        sleep(20);
                     }
-                    while (!itWasFigureIsHold(figure)) {
-                        sleep(10);
+                    while (!itWasFigureIsHold(figure) && !isCancelled()) {
+                        sleep(20);
                     }
 
-                    while (!itWasFigureIsHold(figureList.get(0))) {
-                        sleep(10);
+                    while (!itWasFigureIsHold(figureList.get(0)) && !isCancelled()) {
+                        sleep(20);
                     }
                 }
 
@@ -309,5 +322,7 @@ public class DynamicTestController {
 
     }
 
-
+    public StabiloController getStabilo() {
+        return stabilo;
+    }
 }
