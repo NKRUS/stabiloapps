@@ -85,6 +85,14 @@
             <artifactId>stabilo-api</artifactId>
             <version>${stabiloapi-version}</version>
         </dependency>
+
+        <!-- Sound Manager -->
+        <dependency>
+            <groupId>ru.kit</groupId>
+            <artifactId>sound_manager_scanme</artifactId>
+            <version>1.0.3</version>
+        </dependency>
+
     </dependencies>
 
 

@@ -30,7 +30,7 @@
          <children>
             <HBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
                <children>
-                  <Button fx:id="startButton" mnemonicParsing="false" onAction="#onStart" text="СТАРТ">
+                  <Button fx:id="startButton" disable="true" mnemonicParsing="false" onAction="#onStart" text="СТАРТ">
                      <GridPane.margin>
                         <Insets left="15.0" top="17.0" />
                      </GridPane.margin>
@@ -48,7 +48,7 @@
                         <Insets top="100.0" />
                      </HBox.margin>
                   </Button>
-                  <Button minHeight="40.0" mnemonicParsing="false" onMouseClicked="#onReset" text="&gt; 0 &lt;">
+                  <Button fx:id="buttonReset" disable="true" minHeight="40.0" mnemonicParsing="false" onMouseClicked="#onReset" text="&gt; 0 &lt;">
                      <font>
                         <Font name="Calibri" size="21.0" />
                      </font>
@@ -59,7 +59,7 @@
                      <font>
                         <Font size="1.0" />
                      </font></Label>
-                  <Button fx:id="buttonTest" mnemonicParsing="false" onAction="#onStartTest" text="ТЕСТ">
+                  <Button fx:id="buttonTest" disable="true" mnemonicParsing="false" onAction="#onStartTest" text="ТЕСТ">
                      <HBox.margin>
                         <Insets top="100.0" />
                      </HBox.margin>
@@ -80,7 +80,7 @@
                <children>
                   <ImageView fitHeight="26.0" fitWidth="26.0" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS">
                      <image>
-                        <Image url="@../../../../../../../../skeleton1/src/main/resources/ru/kit/skeleton/image/arrow.png" />
+                        <Image url="@/ru/kit/stabiloapps/image/arrow.png" />
                      </image>
                   </ImageView>
                   <Label maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" text="Динамическая проба - стабилометрия" textFill="WHITE" GridPane.columnIndex="1">

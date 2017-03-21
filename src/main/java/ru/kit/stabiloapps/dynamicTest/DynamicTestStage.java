@@ -11,6 +11,7 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.kit.SoundManager;
 import ru.kit.stabiloapps.dynamicTest.controller.DynamicTestController;
 
 import java.io.IOException;
@@ -24,9 +25,11 @@ public class DynamicTestStage extends Stage {
     private static final Logger LOG = LoggerFactory.getLogger(DynamicTestStage.class);
     private DynamicTestController controller;
     private String path;
+    public static SoundManager soundManager;
 
-    public DynamicTestStage(String path) {
+    public DynamicTestStage(String path, SoundManager soundManager) {
         try {
+            DynamicTestStage.soundManager = soundManager;
             this.path = path;
             FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("ru/kit/stabiloapps/fxml/test_ronberga.fxml"));
             Parent root = loader.load();
@@ -75,6 +78,7 @@ public class DynamicTestStage extends Stage {
             LOG.info("CLOSE STAGE AND SAVE");
             super.close();
         }
+        soundManager.disposeAllSounds();
     }
 
     private void cancelTasks() {

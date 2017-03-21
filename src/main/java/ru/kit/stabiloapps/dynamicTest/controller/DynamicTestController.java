@@ -17,10 +17,12 @@ import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.kit.SoundManager;
 import ru.kit.stabilo.StabiloController;
 import ru.kit.stabiloapps.dynamicTest.DynamicTestStage;
 import ru.kit.stabiloapps.dynamicTest.model.HomeCircle;
 import ru.kit.stabiloapps.dynamicTest.model.MyCircle;
+import ru.kit.stabiloapps.dynamicTest.service.Sounds;
 import ru.kit.stabiloapps.dynamicTest.util.Util;
 
 import static ru.kit.stabiloapps.dynamicTest.model.Constants.*;
@@ -41,9 +43,7 @@ public class DynamicTestController {
     public volatile Label counterLabel;
     public Label time;
     public AnchorPane endPane;
-    public Button buttonOk;
     public ProgressBar progressBar;
-    public Button buttonTest;
     private Rectangle borderGroup;
     private DynamicTestStage stage;
     private StabiloController stabilo;
@@ -54,6 +54,8 @@ public class DynamicTestController {
     private MyCircle cursor;
     private Point correctionToCursor = new Point(0, 0);
     private boolean onStabilo = false;
+
+    public Button startButton, buttonOk, buttonTest, buttonReset;
 
     public void setStage(DynamicTestStage stage) {
         this.stage = stage;
@@ -74,6 +76,7 @@ public class DynamicTestController {
         Thread t = new Thread(controlCursor);
         t.setDaemon(true);
         t.start();
+        DynamicTestStage.soundManager.playSound(Sounds.STABILO_TEST_STARTED, SoundManager.SoundType.VOICE, startButton,buttonReset,buttonTest);
     }
 
     private Task<Void> controlCursor = new Task<Void>() {
@@ -137,6 +140,9 @@ public class DynamicTestController {
     private volatile int[] totalMiliSeconds = {0};
 
     public void onStart(ActionEvent mouseEvent) {
+        startButton.setDisable(true);
+        buttonReset.setDisable(true);
+        buttonTest.setDisable(true);
         stopAndStartTimer();
         rePain();
         startTimer = new Task<Void>() {
@@ -144,14 +150,13 @@ public class DynamicTestController {
             protected Void call() throws Exception {
 
                 threeTwoOne();
+                Platform.runLater(() -> DynamicTestStage.soundManager.playSound(Sounds.WEIGHT_MAIN, SoundManager.SoundType.BACKGROUND));
                 onStabilo = true;
                 progressBar.setProgress(0);
 
                 timer = new Timeline(new KeyFrame(Duration.millis(UPDATE_TIME),
 //                        ae -> time.setText(String.valueOf(totalMiliSeconds[0] += UPDATE_TIME))));
                         ae -> {progressBar.setProgress((totalMiliSeconds[0] += UPDATE_TIME) / END_TIME);
-
-
                         }));
                 timer.setCycleCount(Timeline.INDEFINITE);
                 Thread thread = new Thread(getStartGameTask());
@@ -167,6 +172,11 @@ public class DynamicTestController {
                         timer.stop();
                         endPane.setVisible(true);
                         buttonOk.setDisable(false);
+                        Platform.runLater(() -> {
+                            DynamicTestStage.soundManager.playSound(Sounds.WEIGHT_END, SoundManager.SoundType.BACKGROUND, buttonReset, buttonTest, startButton);
+                            DynamicTestStage.soundManager.playSound(Sounds.ALL_TEST_COMPLETED, SoundManager.SoundType.VOICE);
+                        });
+
                         this.cancel();
                     }
                 }
