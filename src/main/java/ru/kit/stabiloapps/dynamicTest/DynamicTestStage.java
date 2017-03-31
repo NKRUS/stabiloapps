@@ -86,6 +86,7 @@ public class DynamicTestStage extends Stage {
         for (Task task : tasks) {
             task.cancel();
         }
+        controller.closeAll();
         controller.getStabilo().offDynamicData();
     }
 }

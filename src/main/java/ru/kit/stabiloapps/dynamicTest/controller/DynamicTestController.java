@@ -65,6 +65,15 @@ public class DynamicTestController {
         return tasks;
     }
 
+    public void closeAll(){
+        LOG.info("Closing stabilo tasks and timers");
+        if(timer!=null) timer.stop();
+        if(controlCursor!=null) controlCursor.cancel();
+        if(startTimer!=null) startTimer.cancel();
+        if(startGame!=null) startGame.cancel();
+        LOG.info("Closed successfully");
+    }
+
     @FXML
     public void initialize() {
         LOG.info("========= initialize =========");
@@ -74,9 +83,9 @@ public class DynamicTestController {
 
         tasks.add(controlCursor);
         Thread t = new Thread(controlCursor);
-        t.setDaemon(true);
+        //t.setDaemon(true);
         t.start();
-        DynamicTestStage.soundManager.playSound(Sounds.STABILO_TEST_STARTED, SoundManager.SoundType.VOICE, startButton,buttonReset,buttonTest);
+        DynamicTestStage.soundManager.playSound(Sounds.STABILO_TEST_STARTED, SoundManager.SoundType.VOICE, startButton, buttonReset, buttonTest);
     }
 
     private Task<Void> controlCursor = new Task<Void>() {
@@ -85,9 +94,12 @@ public class DynamicTestController {
 
             while (!this.isCancelled()) {
                 draw(stabilo.getX() - correctionToCursor.getX(), stabilo.getY() - correctionToCursor.getY());
-                figureList.forEach(s->{
-                    if (cursor.isIntersect(s)) {s.setFill(Color.RED);}
-                    else {s.setFill(s.getDefaultColor());}
+                figureList.forEach(s -> {
+                    if (cursor.isIntersect(s)) {
+                        s.setFill(Color.RED);
+                    } else {
+                        s.setFill(s.getDefaultColor());
+                    }
                 });
 //                Thread.sleep(0);
             }
@@ -125,14 +137,16 @@ public class DynamicTestController {
         double centerPointSize = centerX * 0.25;
         figureList.add(new HomeCircle(centerX, centerY, centerPointSize, Color.ORANGE));
         double pointSize = centerX * 0.16;
-        figureList.add(new MyCircle(centerX * 0.45, centerY * 0.45, pointSize, Color.AQUA, false));
-        figureList.add(new MyCircle(centerX * 1.55, centerY * 1.55, pointSize, Color.AQUA, false));
-        figureList.add(new MyCircle(centerX * 0.45, centerY * 1.55, pointSize, Color.AQUA, false));
-        figureList.add(new MyCircle(centerX * 1.55, centerY * 0.45, pointSize, Color.AQUA, false));
-        figureList.add(new MyCircle(centerX * 0.23, centerY, pointSize, Color.AQUA, false));
-        figureList.add(new MyCircle(centerX * 1.77, centerY, pointSize, Color.AQUA, false));
-        figureList.add(new MyCircle(centerX, centerY * 0.23, pointSize, Color.AQUA, false));
-        figureList.add(new MyCircle(centerX, centerY * 1.77, pointSize, Color.AQUA, false));
+        for (int i = 0; i<5;i++) {//added 40 points for test
+            figureList.add(new MyCircle(centerX * 0.45, centerY * 0.45, pointSize, Color.AQUA, false));
+            figureList.add(new MyCircle(centerX * 1.55, centerY * 1.55, pointSize, Color.AQUA, false));
+            figureList.add(new MyCircle(centerX * 0.45, centerY * 1.55, pointSize, Color.AQUA, false));
+            figureList.add(new MyCircle(centerX * 1.55, centerY * 0.45, pointSize, Color.AQUA, false));
+            figureList.add(new MyCircle(centerX * 0.23, centerY, pointSize, Color.AQUA, false));
+            figureList.add(new MyCircle(centerX * 1.77, centerY, pointSize, Color.AQUA, false));
+            figureList.add(new MyCircle(centerX, centerY * 0.23, pointSize, Color.AQUA, false));
+            figureList.add(new MyCircle(centerX, centerY * 1.77, pointSize, Color.AQUA, false));
+        }
     }
 
     private Timeline timer;
@@ -156,11 +170,12 @@ public class DynamicTestController {
 
                 timer = new Timeline(new KeyFrame(Duration.millis(UPDATE_TIME),
 //                        ae -> time.setText(String.valueOf(totalMiliSeconds[0] += UPDATE_TIME))));
-                        ae -> {progressBar.setProgress((totalMiliSeconds[0] += UPDATE_TIME) / END_TIME);
+                        ae -> {
+                            progressBar.setProgress((totalMiliSeconds[0] += UPDATE_TIME) / END_TIME);
                         }));
                 timer.setCycleCount(Timeline.INDEFINITE);
                 Thread thread = new Thread(getStartGameTask());
-                thread.setDaemon(true);
+                //thread.setDaemon(true);
                 thread.start();
                 timer.play();
 
@@ -189,7 +204,7 @@ public class DynamicTestController {
         };
 
         Thread t = new Thread(startTimer);
-        t.setDaemon(true);
+        //t.setDaemon(true);
         t.start();
     }
 
@@ -262,7 +277,7 @@ public class DynamicTestController {
             initializeFigureList();
         }
         assert figureList != null;
-        figureList.forEach(s-> group.getChildren().add(s));
+        figureList.forEach(s -> group.getChildren().add(s));
 
         borderGroup = new Rectangle(WIDTH, HEIGHT);
         borderGroup.setFill(Color.TRANSPARENT);
@@ -274,12 +289,13 @@ public class DynamicTestController {
     }
 
     private void rePain() {
-        figureList.forEach(s-> s.setVisible(false));
+        figureList.forEach(s -> s.setVisible(false));
         figureList.get(0).setVisible(true);
     }
 
     private MyCircle figure = null;
     private Task<Void> startGame;
+
     private Task<Void> getStartGameTask() {
         if (startGame != null) {
             startGame.cancel();
@@ -291,6 +307,7 @@ public class DynamicTestController {
                 while (totalMiliSeconds[0] < TIMEOUT_BETWEEN_FIGURES) {
                     sleep(20);
                 }
+                //while(!isCancelled())
                 for (int i = 1; i < figureList.size() && !isCancelled(); i++) {
                     System.out.println(Thread.currentThread().getName());
                     figure = figureList.get(i);
