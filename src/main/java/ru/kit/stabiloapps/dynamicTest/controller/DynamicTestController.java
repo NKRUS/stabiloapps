@@ -10,13 +10,10 @@ import javafx.scene.Group;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import ru.kit.stabilo.StabiloController;
 import ru.kit.stabiloapps.dynamicTest.DynamicTestStage;
 import ru.kit.stabiloapps.dynamicTest.model.HomeCircle;
@@ -33,8 +30,6 @@ import java.util.stream.Collectors;
 
 
 public class DynamicTestController {
-
-    private static final Logger LOG = LoggerFactory.getLogger(DynamicTestController.class);
 
     public Group group;
     public AnchorPane startPane;
@@ -65,7 +60,6 @@ public class DynamicTestController {
 
     @FXML
     public void initialize() {
-        LOG.info("========= initialize =========");
         stabilo = new StabiloController();
         stabilo.onDynamicData();
         addFiguresInGroup();
@@ -78,7 +72,7 @@ public class DynamicTestController {
 
     private Task<Void> controlCursor = new Task<Void>() {
         @Override
-        protected Void call() throws Exception {
+        protected Void call() {
 
             while (!this.isCancelled()) {
                 draw(stabilo.getX() - correctionToCursor.getX(), stabilo.getY() - correctionToCursor.getY());
@@ -136,12 +130,12 @@ public class DynamicTestController {
     private Task<Void> startTimer;
     private volatile int[] totalMiliSeconds = {0};
 
-    public void onStart(ActionEvent mouseEvent) {
+    public void onStart() {
         stopAndStartTimer();
         rePain();
         startTimer = new Task<Void>() {
             @Override
-            protected Void call() throws Exception {
+            protected Void call() {
 
                 threeTwoOne();
                 onStabilo = true;
@@ -229,15 +223,15 @@ public class DynamicTestController {
     }
 
 
-    public void onReset(MouseEvent mouseEvent) {
+    public void onReset() {
         correctionToCursor.setLocation(stabilo.getX(), stabilo.getY());
     }
 
-    public void onCancel(ActionEvent actionEvent) {
+    public void onCancel() {
         stage.close();
     }
 
-    public void onSave(ActionEvent actionEvent) {
+    public void onSave() {
         Map<String, String> map = new HashMap<>();
         map.put("dynamic_test", String.valueOf(figureList.stream().filter(MyCircle::isPassFigure).collect(Collectors.toList()).size()));
         Util.writeJSON(stage.getPath(), map);
