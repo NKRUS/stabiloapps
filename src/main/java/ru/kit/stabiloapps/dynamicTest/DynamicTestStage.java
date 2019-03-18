@@ -1,12 +1,15 @@
 package ru.kit.stabiloapps.dynamicTest;
 
 import javafx.concurrent.Task;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
+import ru.kit.SoundManager;
 import ru.kit.stabiloapps.dynamicTest.controller.DynamicTestController;
 
 import java.io.IOException;
@@ -19,9 +22,11 @@ public class DynamicTestStage extends Stage {
 
     private DynamicTestController controller;
     private String path;
+    public static SoundManager soundManager;
 
-    public DynamicTestStage(String path) {
+    public DynamicTestStage(String path, SoundManager soundManager) {
         try {
+            DynamicTestStage.soundManager = soundManager;
             this.path = path;
             FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("ru/kit/stabiloapps/fxml/test_ronberga.fxml"));
             Parent root = loader.load();
@@ -32,7 +37,12 @@ public class DynamicTestStage extends Stage {
 
             this.setScene(new Scene(root));
 
-            this.setOnCloseRequest(event -> close());
+            this.setOnCloseRequest(new EventHandler<WindowEvent>() {
+                @Override
+                public void handle(WindowEvent event) {
+                    close();
+                }
+            });
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -63,6 +73,7 @@ public class DynamicTestStage extends Stage {
             cancelTasks();
             super.close();
         }
+        soundManager.disposeAllSounds();
     }
 
     private void cancelTasks() {
@@ -70,6 +81,7 @@ public class DynamicTestStage extends Stage {
         for (Task task : tasks) {
             task.cancel();
         }
+        controller.closeAll();
         controller.getStabilo().offDynamicData();
     }
 }

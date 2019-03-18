@@ -9,8 +9,6 @@
     <version>1.0.0</version>
 
     <properties>
-        <logback-version>1.1.7</logback-version>
-        <slf4j-version>1.7.21</slf4j-version>
         <org.json-version>20160810</org.json-version>
         <stabiloapi-version>20170127</stabiloapi-version>
     </properties>
@@ -86,6 +84,14 @@
             <artifactId>stabilo-api</artifactId>
             <version>${stabiloapi-version}</version>
         </dependency>
+
+        <!-- Sound Manager -->
+        <dependency>
+            <groupId>ru.kit</groupId>
+            <artifactId>sound_manager_scanme</artifactId>
+            <version>1.0.3</version>
+        </dependency>
+
     </dependencies>
 
 
