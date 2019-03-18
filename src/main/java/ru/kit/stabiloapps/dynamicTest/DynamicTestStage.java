@@ -9,8 +9,6 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import ru.kit.SoundManager;
 import ru.kit.stabiloapps.dynamicTest.controller.DynamicTestController;
 
@@ -22,7 +20,6 @@ import java.util.List;
  */
 public class DynamicTestStage extends Stage {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DynamicTestStage.class);
     private DynamicTestController controller;
     private String path;
     public static SoundManager soundManager;
@@ -70,12 +67,10 @@ public class DynamicTestStage extends Stage {
             alert.showAndWait();
             if (alert.getResult() == ButtonType.OK) {
                 cancelTasks();
-                LOG.info("CLOSE STAGE, NOT SAVE");
                 super.close();
             }
         } else {
             cancelTasks();
-            LOG.info("CLOSE STAGE AND SAVE");
             super.close();
         }
         soundManager.disposeAllSounds();

@@ -15,8 +15,6 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import ru.kit.SoundManager;
 import ru.kit.stabilo.StabiloController;
 import ru.kit.stabiloapps.dynamicTest.DynamicTestStage;
@@ -36,7 +34,6 @@ import java.util.stream.Collectors;
 
 public class DynamicTestController {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DynamicTestController.class);
 
     public Group group;
     public AnchorPane startPane;
@@ -66,17 +63,14 @@ public class DynamicTestController {
     }
 
     public void closeAll(){
-        LOG.info("Closing stabilo tasks and timers");
         if(timer!=null) timer.stop();
         if(controlCursor!=null) controlCursor.cancel();
         if(startTimer!=null) startTimer.cancel();
         if(startGame!=null) startGame.cancel();
-        LOG.info("Closed successfully");
     }
 
     @FXML
     public void initialize() {
-        LOG.info("========= initialize =========");
         stabilo = new StabiloController();
         stabilo.onDynamicData();
         addFiguresInGroup();
